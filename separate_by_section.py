@@ -8,18 +8,42 @@ from openpyxl.styles import PatternFill
 merged_file = 'merged_inventory_with_traffic.xlsx'
 df = pd.read_excel(merged_file)
 
-print("=== SEPARATING BY PRIMARY SECTION ===\n")
+print("=== SEPARATING BY PRIMARY SECTION (with secondary section handling) ===\n")
 
 # Create output directory
 output_dir = Path('separated_by_section')
 output_dir.mkdir(exist_ok=True)
 
-# Get unique sections sorted alphabetically
-sections = sorted(df['Primary Section'].unique())
+# Prepare data: for "About / Contact / Corporate", use secondary section instead
+sections_to_export = {}
+
+# First, get all non-About/Contact/Corporate sections
+for section in sorted(df['Primary Section'].unique()):
+    if section != 'About / Contact / Corporate':
+        section_df = df[df['Primary Section'] == section].copy()
+        sections_to_export[section] = section_df
+
+# Then, add About/Contact/Corporate items to their secondary sections
+about_corp_df = df[df['Primary Section'] == 'About / Contact / Corporate']
+
+# Items with secondary section
+for secondary in about_corp_df['Secondary Section'].dropna().unique():
+    secondary_df = about_corp_df[about_corp_df['Secondary Section'] == secondary].copy()
+    if secondary in sections_to_export:
+        # Merge with existing section
+        sections_to_export[secondary] = pd.concat([sections_to_export[secondary], secondary_df], ignore_index=True)
+    else:
+        # Create new section
+        sections_to_export[secondary] = secondary_df
+
+# Items with missing secondary section (create "About / Contact / Corporate" file)
+missing_sec_df = about_corp_df[about_corp_df['Secondary Section'].isna()]
+if len(missing_sec_df) > 0:
+    sections_to_export['About / Contact / Corporate'] = missing_sec_df
 
 # Separate and export each section
-for section in sections:
-    section_df = df[df['Primary Section'] == section].copy()
+for section in sorted(sections_to_export.keys()):
+    section_df = sections_to_export[section]
     
     # Create filename from section name (sanitized for file system)
     safe_section_name = section.replace('/', '_').replace(' ', '_')
@@ -70,14 +94,14 @@ for section in sections:
 
 print(f"\n=== SUMMARY ===")
 print(f"Separated files created in: {output_dir}")
-print(f"Total sections: {len(sections)}")
+print(f"Total sections: {len(sections_to_export)}")
 
 # Also create a summary file
 summary_data = []
-for section in sections:
-    section_df = df[df['Primary Section'] == section]
+for section in sorted(sections_to_export.keys()):
+    section_df = sections_to_export[section]
     summary_data.append({
-        'Primary Section': section,
+        'Section': section,
         'Item Count': len(section_df),
         'Total Views': section_df['Views'].sum(),
         'Total Users': section_df['Total Users'].sum(),
