@@ -38,12 +38,22 @@ Successfully merged traffic statistics from Google Analytics with the CTA conten
 
 | Section | Items | Total Views | Total Users |
 |---------|-------|------------|------------|
-| About / Contact / Corporate | 652 | 88,731 | 69,164 |
-| Accessible Transportation | 193 | 52,886 | 37,648 |
-| Complaint and Dispute Resolution | 148 | 48,499 | 35,835 |
-| Compliance Monitoring and Enforcement | 363 | 10,158 | 8,580 |
-| Consultations | 43 | 15,079 | 11,245 |
-| National Transportation System | 224 | 37,773 | 26,855 |
+| Accessible Transportation | 247 | 66,609 | 48,293 |
+| Complaint and Dispute Resolution | 250 | 61,082 | 46,518 |
+| Compliance Monitoring and Enforcement | 711 | 39,674 | 31,741 |
+| Consultations | 52 | 15,456 | 11,550 |
+| National Transportation System | 362 | 70,263 | 51,197 |
+| About / Contact / Corporate | 1 | 42 | 28 |
+
+**Organization Details:**
+- Items with Primary Section = "About / Contact / Corporate" are sorted by their **Secondary Section** instead
+- Secondary sections from About/Contact/Corporate are merged with their corresponding primary sections:
+  - 54 items → Accessible Transportation
+  - 102 items → Complaint and Dispute Resolution
+  - 348 items → Compliance Monitoring and Enforcement
+  - 9 items → Consultations
+  - 138 items → National Transportation System
+- 1 item with missing secondary section kept in About / Contact / Corporate file
 
 Each section file includes:
 - All matching columns from the inventory
@@ -61,11 +71,13 @@ Also includes **`SECTION_SUMMARY.xlsx`** - Summary statistics for all sections.
 | Total Traffic URLs | 2,307 |
 | **Successfully Matched** | **1,623 (100%)** |
 | Unmatched URLs (need crawling) | 874 |
-| Primary Sections | 6 |
+| Primary Sections (in inventory) | 6 |
+| Export Files | 6 |
 
 ## Data Quality Notes
 
 - All inventory items have been matched with traffic data
+- Items categorized as "About / Contact / Corporate" are exported by their secondary section instead of as a single group
 - Some URLs appear in traffic data but not in the inventory (874 URLs) - these should be evaluated for inclusion in future
 - All colors from `cta_content_inventory_output` preserved in merged files
 - Tables are properly formatted and ready for analysis/reporting
